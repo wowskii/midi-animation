@@ -2,7 +2,11 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import MIDI
 from PIL import Image
+
+
+# Image loading utility
 
 def load_images(directory):
 	image_list = []
@@ -35,3 +39,17 @@ def reduce_filtered_image(image):
     false_counts = image.shape[0] - true_counts
     reduced = true_counts > false_counts
     return reduced
+
+def image_to_bool_map(image, num_segments = 48, threshold = 140):
+    segments = divide_image(image, num_segments)
+    bool_maps = [reduce_filtered_image(get_filter(seg, threshold)) for seg in segments]
+    return bool_maps
+
+# MIDI utilities
+
+def create_midi_from_bool_array(bool_array, output_file):
+    MIDI_file = MIDI.MIDIFile()
+    for line in bool_array:
+        noteline = MIDI.Track(line, False)
+        MIDI_file.addTrack(noteline)
+    MIDI_file.parse()
