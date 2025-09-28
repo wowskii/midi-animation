@@ -18,3 +18,20 @@ def get_filter(image, threshold):
     G = np.min(M[:,:,0:3], axis=2)
     F = G < threshold
     return F
+
+def divide_image(image, num_segments):
+    width, height = image.size
+    segment_height = height // num_segments
+    segments = []
+    for i in range(num_segments):
+        box = (0, i * segment_height, width, (i + 1) * segment_height if i < num_segments - 1 else height)
+        segment = image.crop(box)
+        segments.append(segment)
+    return segments
+
+def reduce_filtered_image(image):
+    reduced = np.zeros(image.shape[1], dtype=bool)
+    true_counts = np.sum(image, axis=0)
+    false_counts = image.shape[0] - true_counts
+    reduced = true_counts > false_counts
+    return reduced
