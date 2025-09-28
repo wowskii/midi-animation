@@ -72,3 +72,7 @@ def create_midi_from_bool_array(bool_array, output_file):
 
     with open(output_file, 'wb') as outf:
         mf.writeFile(outf)
+        
+def image_to_midi(image, output_file, num_segments=48, threshold=140):
+    bool_map = image_to_bool_map(image, num_segments, threshold)
+    create_midi_from_bool_array(bool_map, output_file)
