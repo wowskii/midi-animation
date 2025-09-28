@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import MIDI
+from midiutil import MIDIFile
 from PIL import Image
 
 
@@ -48,8 +48,27 @@ def image_to_bool_map(image, num_segments = 48, threshold = 140):
 # MIDI utilities
 
 def create_midi_from_bool_array(bool_array, output_file):
-    MIDI_file = MIDI.MIDIFile()
-    for line in bool_array:
-        noteline = MIDI.Track(line, False)
-        MIDI_file.addTrack(noteline)
-    MIDI_file.parse()
+    mf = MIDIFile(1)
+    track = 0
+    time = 0  # Start at the beginning
+    mf.addTrackName(track, time, "Image Track")
+    mf.addTempo(track, time, 120)
+    channel = 0
+    volume = 100
+
+    for i, line in enumerate(bool_array):
+        in_note = False
+        pitch = 60 + (len(bool_array) - i)  # C4 (Middle C) (60) + column index
+        for j, val in enumerate(line):
+            if val and not in_note:
+                in_note = True
+                note_begin = j
+            elif in_note and (not val):
+                mf.addNote(track, channel, pitch, note_begin, j - note_begin, volume)
+                in_note = False
+        # If the note is still on at the end of the row, close it
+        if in_note:
+            mf.addNote(track, channel, pitch, note_begin, len(line) - note_begin, volume)
+
+    with open(output_file, 'wb') as outf:
+        mf.writeFile(outf)
