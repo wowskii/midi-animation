@@ -1,8 +1,8 @@
 streamlit
+numpy<2
+opencv-python-headless
 matplotlib
-numpy==2.0.0
 pandas
 pyautogui
 midiutil
 Pillow
-opencv-python-headless==4.9.0.80
