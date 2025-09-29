@@ -112,6 +112,37 @@ def image_to_bool_array(image, num_segments=48, threshold=140):
 
 # ---------------- MIDI Utilities ----------------
 
+def add_bool_array_to_midi(mf, bool_array, track=0, channel=0, time_offset=0, volume=100):
+    """
+    Adds notes from a 2D boolean array to a MIDIFile object.
+
+    Args:
+        mf (MIDIFile): The MIDIFile object to add notes to.
+        bool_array (list[np.ndarray]): 2D boolean array (segments x time).
+        track (int): MIDI track number.
+        channel (int): MIDI channel.
+        time_offset (int): Time offset for note placement.
+        volume (int): Note volume.
+    """
+    for i, line in enumerate(bool_array):
+        in_note = False
+        note_begin = None
+        pitch = 60 + (len(bool_array) - i)
+        for j, val in enumerate(line):
+            abs_j = j + time_offset
+            if val and not in_note:
+                in_note = True
+                note_begin = abs_j
+            elif in_note and not val:
+                length = abs_j - note_begin
+                if length > 0:
+                    mf.addNote(track, channel, pitch, note_begin, length, volume)
+                in_note = False
+        if in_note and note_begin is not None:
+            length = time_offset + len(line) - note_begin
+            if length > 0:
+                mf.addNote(track, channel, pitch, note_begin, length, volume)
+
 def midi_from_bool_array(bool_array, output_file, channel=0):
     """
     Creates a MIDI file from a 2D boolean array.
@@ -128,19 +159,7 @@ def midi_from_bool_array(bool_array, output_file, channel=0):
     mf.addTempo(track, time, 120)
     volume = 100
 
-    for i, line in enumerate(bool_array):
-        in_note = False
-        pitch = 60 + (len(bool_array) - i)  # C4 (Middle C) + segment index
-        for j, val in enumerate(line):
-            if val and not in_note:
-                in_note = True
-                note_begin = j
-            elif in_note and (not val):
-                mf.addNote(track, channel, pitch, note_begin, j - note_begin, volume)
-                in_note = False
-        # If the note is still on at the end of the row, close it
-        if in_note:
-            mf.addNote(track, channel, pitch, note_begin, len(line) - note_begin, volume)
+    add_bool_array_to_midi(mf, bool_array, track, channel, time, volume)
 
     with open(output_file, 'wb') as outf:
         mf.writeFile(outf)
@@ -156,68 +175,16 @@ def midi_from_bool_arrays(list_of_bool_arrays, output_file):
     mf = MIDIFile(6600)
     channel = 0
     time = 0
-    mf.addTrackName(0, time, "Image Track")
+    mf.addTrackName(0, time, "Video Track")
     mf.addTempo(0, time, 120)
     volume = 100
     for track, bool_array in enumerate(list_of_bool_arrays):
         print(f"Processing frame {track+1}/{len(list_of_bool_arrays)}")
-        for i, line in enumerate(bool_array):
-            in_note = False
-            pitch = 60 + (len(bool_array) - i)
-            for j, val in enumerate(line):
-                if val and not in_note:
-                    in_note = True
-                    note_begin = j
-                elif in_note and (not val):
-                    mf.addNote(track, channel, pitch, note_begin, j - note_begin, volume)
-                    in_note = False
-            if in_note:
-                mf.addNote(track, channel, pitch, note_begin, len(line) - note_begin, volume)
+        add_bool_array_to_midi(mf, bool_array, track, channel, time, volume)
     with open(output_file, 'wb') as outf:
         mf.writeFile(outf)
 
-def midi_from_bool_arrays_long(list_of_bool_arrays, output_file):
-    """
-    Creates a single-track MIDI file from a list of 2D boolean arrays, concatenating them in time.
 
-    Args:
-        list_of_bool_arrays (list[list[np.ndarray]]): List of 2D boolean arrays.
-        output_file (str): Output MIDI file path.
-    """
-    mf = MIDIFile(1)
-    channel = 0
-    track = 0
-    time = 0
-    mf.addTrackName(track, time, "Image Track")
-    mf.addTempo(track, time, 120)
-    volume = 100
-    time_offset = 0
-    for frame_index, bool_array in enumerate(list_of_bool_arrays):
-        print(f"Processing frame {frame_index+1}/{len(list_of_bool_arrays)}")
-        for i, line in enumerate(bool_array):
-            in_note = False
-            note_begin = None
-            pitch = 60 + (len(bool_array) - i)
-            for j, val in enumerate(line):
-                abs_j = j + time_offset
-                if val and not in_note:
-                    in_note = True
-                    note_begin = abs_j
-                elif in_note and not val:
-                    length = abs_j - note_begin
-                    if length > 0:
-                        mf.addNote(track, channel, pitch, note_begin, length, volume)
-                    in_note = False
-            if in_note and note_begin is not None:
-                length = time_offset + len(line) - note_begin
-                if length > 0:
-                    mf.addNote(track, channel, pitch, note_begin, length, volume)
-        time_offset += len(bool_array[0])  # Assuming all lines have the same length
-    HORIZONTAL_RESOLUTION = len(list_of_bool_arrays[0][0]) if list_of_bool_arrays else 0
-    with open("horizontal_resolution.txt", "w") as f:
-        f.write(str(HORIZONTAL_RESOLUTION))
-    with open(output_file, 'wb') as outf:
-        mf.writeFile(outf)
 
 def image_to_midi(image, output_file, num_segments=48, threshold=140):
     """
@@ -231,6 +198,7 @@ def image_to_midi(image, output_file, num_segments=48, threshold=140):
     """
     bool_map = image_to_bool_array(image, num_segments, threshold)
     midi_from_bool_array(bool_map, output_file)
+
 
 def frames_folder_to_bool_arrays(frames_folder, num_segments=48, threshold=140):
     """
@@ -260,6 +228,36 @@ def frames_folder_to_midi(frames_folder, output_file, num_segments=48, threshold
     """
     bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold)
     midi_from_bool_arrays(bool_arrays, output_file)
+
+
+    
+# ---------------- Long MIDI / scrollable MIDI videos ----------------
+
+def midi_from_bool_arrays_long(list_of_bool_arrays, output_file):
+    """
+    Creates a single-track MIDI file from a list of 2D boolean arrays, concatenating them in time.
+
+    Args:
+        list_of_bool_arrays (list[list[np.ndarray]]): List of 2D boolean arrays.
+        output_file (str): Output MIDI file path.
+    """
+    mf = MIDIFile(1)
+    channel = 0
+    track = 0
+    time = 0
+    mf.addTrackName(track, time, "Image Track")
+    mf.addTempo(track, time, 120)
+    volume = 100
+    time_offset = 0
+    for frame_index, bool_array in enumerate(list_of_bool_arrays):
+        print(f"Processing frame {frame_index+1}/{len(list_of_bool_arrays)}")
+        add_bool_array_to_midi(mf, bool_array, track, channel, time_offset, volume)
+        time_offset += len(bool_array[0]) if bool_array else 0
+    HORIZONTAL_RESOLUTION = len(list_of_bool_arrays[0][0]) if list_of_bool_arrays else 0
+    with open("horizontal_resolution.txt", "w") as f:
+        f.write(str(HORIZONTAL_RESOLUTION))
+    with open(output_file, 'wb') as outf:
+        mf.writeFile(outf)
 
 def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, threshold=140):
     """

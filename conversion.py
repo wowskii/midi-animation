@@ -7,7 +7,7 @@ import os
 
 from utilities import *
 
-image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
+
 
 # split_dir = "BadApple_frames_split"
 # folders = sorted([f for f in os.listdir(split_dir) if os.path.isdir(os.path.join(split_dir, f))])
@@ -24,5 +24,9 @@ image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
 # frames_folder_to_long_midi("BadApple_specific/BadApple_frames/second/", "midi_files/non_batched/second.mid")
 
 # frames_folder_to_midi("BadApple_frames", "midi_files/non_batched/bad_apple_full.mid")
+
+image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
+
+frames_folder_to_midi("BadApple_specific/BadApple_frames_light", "midi_files/light_bad_apple.mid")
 
 video_to_midi("video_examples/bad_apple_short.mp4", "midi_examples/short_bad_apple.mid")
