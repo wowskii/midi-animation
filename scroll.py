@@ -5,8 +5,8 @@ from pynput.mouse import Controller
 mouse = Controller()
 
 # scroll settings
-fps = 15             # how many scrolls per second
-duration = 500        # how many seconds to run
+fps = 30             # how many scrolls per second
+duration = 200        # how many seconds to run
 steps = int(fps * duration)
 
 time.sleep(5)  # time to switch to target window
