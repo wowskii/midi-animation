@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 from midiutil import MIDIFile
 from PIL import Image
+import cv2
 
 
 HORIZONTAL_RESOLUTION = 0
@@ -276,7 +277,7 @@ def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, thre
 
 def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
     """
-    Converts a video file to a single-track, time-concatenated MIDI file.
+    Converts a video file to a single-track, time-concatenated MIDI file using OpenCV.
 
     Args:
         video_path (str): Path to the input video file.
@@ -284,17 +285,19 @@ def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
         num_segments (int): Number of vertical segments per frame.
         threshold (int): Threshold for filtering.
     """
-    from moviepy import VideoFileClip
-    import tempfile
+    cap = cv2.VideoCapture(video_path)
+    bool_arrays = []
+    frame_count = 0
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        clip = VideoFileClip(video_path)
-        frame_paths = []
-        for i, frame in enumerate(clip.iter_frames()):
-            frame_image = Image.fromarray(frame)
-            frame_path = os.path.join(temp_dir, f"frame_{i:05d}.png")
-            frame_image.save(frame_path)
-            frame_paths.append(frame_path)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        # Convert BGR (OpenCV) to RGB (PIL)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(frame_rgb)
+        bool_arrays.append(image_to_bool_array(img, num_segments, threshold))
+        frame_count += 1
 
-        bool_arrays = [image_to_bool_array(Image.open(fp), num_segments, threshold) for fp in frame_paths]
-        midi_from_bool_arrays_long(bool_arrays, output_file)
+    cap.release()
+    midi_from_bool_arrays_long(bool_arrays, output_file)
