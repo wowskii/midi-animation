@@ -19,5 +19,5 @@ steps = int(fps * duration)
 time.sleep(5)  # time to switch to target window
 # run scrolling loop
 for i in range(steps):
-    mouse.scroll(HORIZONTAL_RESOLUTION/24, 0)  # (x, y) -> scroll down 1 unit
+    mouse.scroll(HORIZONTAL_RESOLUTION/(24*4), 0)  # (x, y) -> scroll down 1 unit
     time.sleep(1 / fps)

@@ -112,9 +112,9 @@ def image_to_bool_array(image, num_segments=48, threshold=140):
 
 # ---------------- MIDI Utilities ----------------
 
-def add_bool_array_to_midi(mf, bool_array, track=0, channel=0, time_offset=0, volume=100):
+def add_bool_array_to_midi(mf, bool_array, track=0, channel=0, time_offset=0, volume=100, time_scale=4):
     """
-    Adds notes from a 2D boolean array to a MIDIFile object.
+    Adds notes from a 2D boolean array to a MIDIFile object, with optional time scaling.
 
     Args:
         mf (MIDIFile): The MIDIFile object to add notes to.
@@ -123,6 +123,7 @@ def add_bool_array_to_midi(mf, bool_array, track=0, channel=0, time_offset=0, vo
         channel (int): MIDI channel.
         time_offset (int): Time offset for note placement.
         volume (int): Note volume.
+        time_scale (int): Scale factor for time (default is 1, no scaling).
     """
     for i, line in enumerate(bool_array):
         in_note = False
@@ -130,16 +131,17 @@ def add_bool_array_to_midi(mf, bool_array, track=0, channel=0, time_offset=0, vo
         pitch = 60 + (len(bool_array) - i)
         for j, val in enumerate(line):
             abs_j = j + time_offset
+            scaled_j = abs_j // time_scale
             if val and not in_note:
                 in_note = True
-                note_begin = abs_j
+                note_begin = scaled_j
             elif in_note and not val:
-                length = abs_j - note_begin
+                length = scaled_j - note_begin
                 if length > 0:
                     mf.addNote(track, channel, pitch, note_begin, length, volume)
                 in_note = False
         if in_note and note_begin is not None:
-            length = time_offset + len(line) - note_begin
+            length = ((time_offset + len(line)) // time_scale) - note_begin
             if length > 0:
                 mf.addNote(track, channel, pitch, note_begin, length, volume)
 

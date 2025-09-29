@@ -25,8 +25,8 @@ from utilities import *
 
 # frames_folder_to_midi("BadApple_frames", "midi_files/non_batched/bad_apple_full.mid")
 
-image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
+# image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
 
-frames_folder_to_midi("BadApple_specific/BadApple_frames_light", "midi_files/light_bad_apple.mid")
+# frames_folder_to_midi("BadApple_specific/BadApple_frames_light", "midi_files/light_bad_apple.mid")
 
 video_to_midi("video_examples/bad_apple_short.mp4", "midi_examples/short_bad_apple.mid")
