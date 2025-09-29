@@ -5,5 +5,5 @@ numpy
 pandas
 pyautogui
 midiutil
-PIL
+Pillow
 os

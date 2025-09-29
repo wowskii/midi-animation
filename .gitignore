@@ -1,7 +1,5 @@
 __pycache__/
 BadApple_specific/
-FL-midi-sequence.pyscript/
-queue_state.txt/
 midi_files/
 midi_queue/
-stlite_preview.html/
+stlite_preview.html
