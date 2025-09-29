@@ -19,8 +19,10 @@ image_to_midi("images_examples/notre-dame.jpg", "midi_files/notre-dame.mid")
 #         f"midi_files/bad_apple{i}.mid"
 #     )
 
-frames_folder_to_long_midi("BadApple_specific/BadApple_frames/first/", "midi_files/non_batched/first.mid")
+# frames_folder_to_long_midi("BadApple_specific/BadApple_frames/first/", "midi_files/non_batched/first.mid")
 
-frames_folder_to_long_midi("BadApple_specific/BadApple_frames/second/", "midi_files/non_batched/second.mid")
+# frames_folder_to_long_midi("BadApple_specific/BadApple_frames/second/", "midi_files/non_batched/second.mid")
 
 # frames_folder_to_midi("BadApple_frames", "midi_files/non_batched/bad_apple_full.mid")
+
+video_to_midi("video_examples/bad_apple_short.mp4", "midi_examples/short_bad_apple.mid")

@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from midiutil import MIDIFile
 from PIL import Image
 
+
+HORIZONTAL_RESOLUTION = 0
+
 # ---------------- Image Utilities ----------------
 
 def load_images_from_folder(folder_path):
@@ -209,7 +212,9 @@ def midi_from_bool_arrays_long(list_of_bool_arrays, output_file):
                 if length > 0:
                     mf.addNote(track, channel, pitch, note_begin, length, volume)
         time_offset += len(bool_array[0])  # Assuming all lines have the same length
-
+    HORIZONTAL_RESOLUTION = len(list_of_bool_arrays[0][0]) if list_of_bool_arrays else 0
+    with open("horizontal_resolution.txt", "w") as f:
+        f.write(str(HORIZONTAL_RESOLUTION))
     with open(output_file, 'wb') as outf:
         mf.writeFile(outf)
 

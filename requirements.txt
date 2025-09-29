@@ -1,0 +1,9 @@
+streamlit
+matplotlib
+moviepy
+numpy
+pandas
+pyautogui
+midiutil
+PIL
+os
