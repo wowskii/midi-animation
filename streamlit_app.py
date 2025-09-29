@@ -1,5 +1,5 @@
 import streamlit as st
-from utilities import video_to_midi  # your function
+from utilities import video_to_midi
 
 st.title("Video to MIDI Converter 🎹")
 
