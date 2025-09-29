@@ -5,4 +5,4 @@ pandas
 pyautogui
 midiutil
 Pillow
-opencv-python
+opencv-python-headless==4.9.0.80
