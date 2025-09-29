@@ -1,0 +1,6 @@
+document better
+make a selection of the horizontal length of the midi
+optimise utilities.py to not have repeating code
+rename repo and function names (make a new section in utilities.py) to include the "video" part of the project
+write an explanation for scroll.py
+demo video
