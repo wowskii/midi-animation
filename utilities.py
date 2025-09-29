@@ -267,3 +267,29 @@ def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, thre
     """
     bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold)
     midi_from_bool_arrays_long(bool_arrays, output_file)
+    
+
+def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
+    """
+    Converts a video file to a single-track, time-concatenated MIDI file.
+
+    Args:
+        video_path (str): Path to the input video file.
+        output_file (str): Output MIDI file path.
+        num_segments (int): Number of vertical segments per frame.
+        threshold (int): Threshold for filtering.
+    """
+    from moviepy import VideoFileClip
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        clip = VideoFileClip(video_path)
+        frame_paths = []
+        for i, frame in enumerate(clip.iter_frames()):
+            frame_image = Image.fromarray(frame)
+            frame_path = os.path.join(temp_dir, f"frame_{i:05d}.png")
+            frame_image.save(frame_path)
+            frame_paths.append(frame_path)
+
+        bool_arrays = [image_to_bool_array(Image.open(fp), num_segments, threshold) for fp in frame_paths]
+        midi_from_bool_arrays_long(bool_arrays, output_file)
