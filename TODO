@@ -1,5 +1,6 @@
 document better
-rename repo and function names (make a new section in utilities.py) to include the "video" part of the project
+rename repo and function names (make a new section in utilities.py) to include the "video" part of the project DONE
 write an explanation for scroll.py
-demo video
-find a way to reduce horizontal resolution, aka to optimise, and let the user select what they want
+demo video DONE
+find a way to reduce horizontal resolution, aka to optimise, and let the user select what they want DONE
+make a preview of threshold and segments on webapp
