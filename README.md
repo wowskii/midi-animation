@@ -6,7 +6,7 @@ Who wants to read the README? I've made a simple [Video to MIDI Animation conver
 
 Seriously though...
 
-## How to Use `convert_any.py`
+## How to Use `convert.py`
 
 This script converts an image or video file into a MIDI file.
 
@@ -23,20 +23,16 @@ python convert.py <input_file> <output_midi>
 
 Convert an image:
 ```bash
-python convert_any.py my_image.png output.mid
+python convert.py my_image.png output.mid
 ```
 
 Convert a video:
 ```bash
-python convert_any.py my_video.mp4 output.mid
+python convert.py my_video.mp4 output.mid
 ```
 
 ### Notes
 
 - For images, the script creates a MIDI file representing the image.
 - For videos, the script creates a "scrollable" MIDI reel, where each frame is mapped to a segment of the MIDI file.
-- Make sure you have all dependencies installed (`midiutil`, `Pillow`, `opencv-python`).
-
-
-
-it's late, and i gotta go to sleep, but i promise i'll update this file tomorrow!
+- Make sure you have all dependencies installed (`requirements.txt`).

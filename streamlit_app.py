@@ -54,4 +54,4 @@ st.code("""scroll.py [HORIZONTAL_RESOLUTION]"""
 )
 """More details will be available in the README of the GitHub repo soon!
 Here's a preview of the MIDI output for the video I uploaded:
-YOUTUBELINKHERE"""
+https://youtu.be/la5YD5i3txY?si=fWyBKqsTSn4V7-pU"""
