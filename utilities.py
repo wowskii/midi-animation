@@ -92,7 +92,7 @@ def reduce_bool_image_columns(bool_image):
     reduced = true_counts > false_counts
     return reduced
 
-def image_to_bool_array(image, num_segments=48, threshold=140):
+def image_to_bool_array(image, num_segments=48, threshold=140, invert=False):
     """
     Converts an image to a list of boolean arrays representing vertical segments.
 
@@ -100,6 +100,7 @@ def image_to_bool_array(image, num_segments=48, threshold=140):
         image (PIL.Image.Image or str): Input image or path.
         num_segments (int): Number of vertical segments.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
 
     Returns:
         list[np.ndarray]: List of 1D boolean arrays for each segment.
@@ -108,6 +109,8 @@ def image_to_bool_array(image, num_segments=48, threshold=140):
         image = Image.open(image)
     segments = divide_image_vertically(image, num_segments)
     bool_maps = [reduce_bool_image_columns(get_image_filter(seg, threshold)) for seg in segments]
+    if invert:
+        bool_maps = [np.logical_not(arr) for arr in bool_maps]
     return bool_maps
 
 # ---------------- MIDI Utilities ----------------
@@ -188,7 +191,7 @@ def midi_from_bool_arrays(list_of_bool_arrays, output_file):
 
 
 
-def image_to_midi(image, output_file, num_segments=48, threshold=140):
+def image_to_midi(image, output_file, num_segments=48, threshold=140, invert=False):
     """
     Converts an image to a MIDI file by thresholding and segmenting.
 
@@ -197,12 +200,12 @@ def image_to_midi(image, output_file, num_segments=48, threshold=140):
         output_file (str): Output MIDI file path.
         num_segments (int): Number of vertical segments.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
     """
-    bool_map = image_to_bool_array(image, num_segments, threshold)
+    bool_map = image_to_bool_array(image, num_segments, threshold, invert)
     midi_from_bool_array(bool_map, output_file)
 
-
-def frames_folder_to_bool_arrays(frames_folder, num_segments=48, threshold=140):
+def frames_folder_to_bool_arrays(frames_folder, num_segments=48, threshold=140, invert=False):
     """
     Loads all images from a folder and converts each to a boolean array.
 
@@ -210,15 +213,16 @@ def frames_folder_to_bool_arrays(frames_folder, num_segments=48, threshold=140):
         frames_folder (str): Path to folder containing frames.
         num_segments (int): Number of vertical segments per image.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
 
     Returns:
         list[list[np.ndarray]]: List of boolean arrays (one per frame).
     """
     images = load_images_from_folder(frames_folder)
-    bool_arrays = [image_to_bool_array(img, num_segments, threshold) for img in images]
+    bool_arrays = [image_to_bool_array(img, num_segments, threshold, invert) for img in images]
     return bool_arrays
 
-def frames_folder_to_midi(frames_folder, output_file, num_segments=48, threshold=140):
+def frames_folder_to_midi(frames_folder, output_file, num_segments=48, threshold=140, invert=False):
     """
     Converts all images in a folder to a multi-track MIDI file.
 
@@ -227,13 +231,10 @@ def frames_folder_to_midi(frames_folder, output_file, num_segments=48, threshold
         output_file (str): Output MIDI file path.
         num_segments (int): Number of vertical segments per image.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
     """
-    bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold)
+    bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold, invert)
     midi_from_bool_arrays(bool_arrays, output_file)
-
-
-    
-# ---------------- Long MIDI / scrollable MIDI videos ----------------
 
 def midi_from_bool_arrays_long(list_of_bool_arrays, output_file):
     """
@@ -261,7 +262,7 @@ def midi_from_bool_arrays_long(list_of_bool_arrays, output_file):
     with open(output_file, 'wb') as outf:
         mf.writeFile(outf)
 
-def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, threshold=140):
+def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, threshold=140, invert=False):
     """
     Converts all images in a folder to a single-track, time-concatenated MIDI file.
 
@@ -270,12 +271,12 @@ def frames_folder_to_long_midi(frames_folder, output_file, num_segments=48, thre
         output_file (str): Output MIDI file path.
         num_segments (int): Number of vertical segments per image.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
     """
-    bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold)
+    bool_arrays = frames_folder_to_bool_arrays(frames_folder, num_segments, threshold, invert)
     midi_from_bool_arrays_long(bool_arrays, output_file)
-    
 
-def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
+def video_to_midi(video_path, output_file, num_segments=48, threshold=140, invert=False):
     """
     Converts a video file to a single-track, time-concatenated MIDI file using OpenCV.
 
@@ -284,6 +285,7 @@ def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
         output_file (str): Output MIDI file path.
         num_segments (int): Number of vertical segments per frame.
         threshold (int): Threshold for filtering.
+        invert (bool): If True, invert the boolean values.
     """
     cap = cv2.VideoCapture(video_path)
     bool_arrays = []
@@ -296,7 +298,7 @@ def video_to_midi(video_path, output_file, num_segments=48, threshold=140):
         # Convert BGR (OpenCV) to RGB (PIL)
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(frame_rgb)
-        bool_arrays.append(image_to_bool_array(img, num_segments, threshold))
+        bool_arrays.append(image_to_bool_array(img, num_segments, threshold, invert))
         frame_count += 1
 
     cap.release()

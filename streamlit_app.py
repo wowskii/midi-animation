@@ -9,6 +9,7 @@ st.title("Video to MIDI Converter 🎹")
 uploaded_file = st.file_uploader("Upload an image or a video", type=["mp4", "mov", "avi", "mkv", "webm", "png", "jpg", "jpeg", "bmp", "gif"])
 num_segments = st.slider("Number of segments (higher = more detail)", min_value=10, max_value=100, value=48, step=1)
 threshold = st.slider("Brightness threshold (how the algorithm differentiates the foreground and background of the video)", min_value=0, max_value=255, value=140, step=1)
+invert_colors = st.checkbox("Invert colors", value=False)
 if uploaded_file:
     if uploaded_file.type.startswith("image/"):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
@@ -17,7 +18,7 @@ if uploaded_file:
 
         with st.spinner("Converting image to MIDI..."):
             output_path = "output.mid"
-            image_to_midi(temp_image_path, output_path, num_segments=num_segments, threshold=threshold)
+            image_to_midi(temp_image_path, output_path, num_segments=num_segments, threshold=threshold, invert=invert_colors)
         with open(output_path, "rb") as f:
             st.download_button("Download MIDI", f, file_name="output.mid")
     else:
@@ -38,7 +39,7 @@ if uploaded_file:
         else:
             with st.spinner("Converting video to MIDI..."):
                 output_path = "output.mid"
-                video_to_midi(temp_video_path, output_path, num_segments=48, threshold=140)
+                video_to_midi(temp_video_path, output_path, num_segments=num_segments, threshold=threshold, invert=invert_colors)
             with open(output_path, "rb") as f:
                 st.download_button("Download MIDI", f, file_name="output.mid")
 

@@ -7,16 +7,14 @@ def print_usage():
     print("  python convert.py <input_file> <output_midi> [--long]")
     print("    <input_file>: Path to image or video file")
     print("    <output_midi>: Path to output MIDI file")
-    print("    --long: (optional) For images, output a long MIDI reel (horizontal scroll)")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print_usage()
         sys.exit(1)
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
-    long_mode = "--long" in sys.argv
 
 
     ext = os.path.splitext(input_file)[1].lower()
